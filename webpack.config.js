@@ -13,18 +13,9 @@ module.exports = {
       {
         loader: 'babel-loader',
         exclude: /(node_modules)/,
-      },
-      {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
-      },
-      {
-        test: /\.(png|pdf|jpe?g|gif|svg)$/i,
-        use: [
-          {
-            loader: 'file-loader',
-          },
-        ],
+        options: {
+          presets: ['@babel/preset-react']
+        }
       },
     ],
   },

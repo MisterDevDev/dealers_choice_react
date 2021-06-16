@@ -1,32 +1,30 @@
-const { default: axios } = require('axios');
-const express = require('express');
-const path = require('path');
-const app = express();
+const Sequelize = require('sequelize')
+const db = new Sequelize(
+    'postgres://localhost:5432/EPC_data'
+    )
 
-const API_KEY = '6c93a148aa30236b2b03b7571f3929ce4ba0b3f1bfec802794cae11494347e4b'
-const url = `https://portal.suncom.myflorida.com/stash/protected/mfn2/erate_complex.json?auth=${API_KEY}`;
-
-const DIST_PATH = path.join(__dirname, './dist');
-const PUBLIC_PATH = path.join(__dirname, './public');
-const PORT = process.env.PORT || 1337;
-
-
-app.use(express.static(DIST_PATH));
-app.use(express.static(PUBLIC_PATH));
-
-
-app.get('/api/fy', async (req, res) => {
-    let data;
-    data = (await axios.get(url)).data;
-    res.send(data)
-})
-
-app.get('*', async (req, res) => {
-    try {
-        res.sendFile(path.join(__dirname, './public/index.html'));    
-    } catch (error) {
-        console.log(error)
+const Application = db.define('application', {
+    appNum: {
+        type: Sequelize.DataTypes.BIGINT,
+        primaryKey: true
+    },
+    total_eligible: {
+        type: Sequelize.DataTypes.FLOAT
     }
 })
 
-app.listen(PORT, () => console.log(`App listening on Port ${PORT}`))
+const dbSync = async() => {
+    try {
+        await db.sync()
+        console.log('database synced!')
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+module.exports = {
+    dbSync,
+    models: {
+        Application
+    }
+}
