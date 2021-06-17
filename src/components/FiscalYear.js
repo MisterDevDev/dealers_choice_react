@@ -2,11 +2,14 @@ import React from 'react';
 import E_App from './E_App'
 
 export default function FiscalYear (props) {
-    const { year, state, selectYear } = props
+    const { year, state, selectYear, deselectYear } = props
     const { apiData, selectedYear, EPC_data } = state
     return(
         <div>
-            <div onClick={()=> selectYear(year)}>{year}</div>
+            <div className='fiscalYear' onClick={()=> 
+                state.selectedYear ? deselectYear() :
+                selectYear(year)}>
+                Fiscal Year: {year} <button>+</button></div>
             <div>
                 {selectedYear === year ? 
                 apiData.fundingDetail.map((app, idx) => {
@@ -18,10 +21,14 @@ export default function FiscalYear (props) {
                         fundingYear = {app.fundingYear}
                         inventory = {app.inventory}
                         EPC_data = {EPC_data}
+                        year = {year}
+                        selectYear = {selectYear}
+                        deselectYear = {deselectYear}
                         key = {idx}
                         />
                         : ''
-                )})
+                )}
+                )
                 : ''}
             </div>
         </div>

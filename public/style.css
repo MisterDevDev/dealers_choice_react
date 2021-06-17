@@ -1,0 +1,23 @@
+.main {
+    background-color:lightsteelblue;
+}
+
+.fiscalYear {
+    font-size: xx-large;
+}
+
+.app {
+    background-size: cover;
+}
+
+.E_app {
+    border-style: solid;
+    padding: 5px;
+    font-weight: bold;
+}
+
+.EPC_form {
+    border-style: solid;
+    padding: 10px;
+    font-weight: bold;
+}

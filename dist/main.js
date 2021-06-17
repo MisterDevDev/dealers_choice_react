@@ -1859,31 +1859,40 @@ class App extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
 
   async componentDidMount() {
     const apiData = (await axios__WEBPACK_IMPORTED_MODULE_1___default().get('/api')).data;
-    const EPC_data = (await axios__WEBPACK_IMPORTED_MODULE_1___default().get('/db')).data;
     this.setState({
-      apiData,
-      EPC_data
+      apiData
     });
   }
 
-  selectYear = year => {
+  selectYear = async year => {
+    const EPC_data = (await axios__WEBPACK_IMPORTED_MODULE_1___default().get('/db')).data;
     this.setState({
-      selectedYear: year
+      selectedYear: year,
+      EPC_data
+    });
+  };
+  deselectYear = () => {
+    this.setState({
+      selectedYear: ''
     });
   };
 
   render() {
-    console.log(this);
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_components_FiscalYear__WEBPACK_IMPORTED_MODULE_2__.default, {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+      className: "app"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_components_FiscalYear__WEBPACK_IMPORTED_MODULE_2__.default, {
       year: 2018,
+      deselectYear: this.deselectYear,
       state: this.state,
       selectYear: this.selectYear
     }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_components_FiscalYear__WEBPACK_IMPORTED_MODULE_2__.default, {
       year: 2019,
+      deselectYear: this.deselectYear,
       state: this.state,
       selectYear: this.selectYear
     }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_components_FiscalYear__WEBPACK_IMPORTED_MODULE_2__.default, {
       year: 2020,
+      deselectYear: this.deselectYear,
       state: this.state,
       selectYear: this.selectYear
     }));
@@ -1913,17 +1922,26 @@ class EPC_form extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
   constructor(props) {
     super(props);
     this.state = {
-      total: 0
+      total: 0,
+      year: this.props.year
     };
   }
 
+  findEpcMatch = () => {
+    this.props.EPC_data.forEach(row => {
+      this.props._appNum === row.appNum ? this.setState({
+        total_eligible: row.total_eligible
+      }) : '';
+    });
+  };
   postHandler = async e => {
     e.preventDefault();
-    const post = await axios__WEBPACK_IMPORTED_MODULE_1___default().post('/db/post', {
+    await axios__WEBPACK_IMPORTED_MODULE_1___default().post('/db/post', {
       total_eligible: this.state.total,
       appNum: this.props._appNum
     });
-    console.log(post);
+    this.props.deselectYear();
+    this.props.selectYear(this.props.year);
   };
   handleChange = event => {
     this.setState({
@@ -1931,8 +1949,15 @@ class EPC_form extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
     });
   };
 
+  componentDidMount() {
+    this.findEpcMatch();
+  }
+
   render() {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("form", {
+    const total = this.state.total_eligible;
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+      className: "EPC_form"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "EPC Amount: $", total ? (total * 1).toLocaleString('en-US') : 0), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, total ? '' : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("form", {
       onSubmit: this.postHandler,
       style: {
         display: 'flex'
@@ -1953,7 +1978,7 @@ class EPC_form extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
       style: {
         flex: '1'
       }
-    })));
+    })))));
   }
 
 }
@@ -1981,20 +2006,22 @@ function E_App(props) {
     appNum,
     fundingYear,
     inventory,
-    EPC_data
+    EPC_data,
+    year,
+    selectYear,
+    deselectYear
   } = props;
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "FRN: ", frn), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "471: ", appNum), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "Year: ", fundingYear), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "Total Funding: $", inventory.reduce((acc, cur) => {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "E_app"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "FRN: ", frn), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "471: ", appNum), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "Year: ", fundingYear), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "API Amount: $", inventory.reduce((acc, cur) => {
     acc += cur.total_eligible;
     return acc;
-  }, 0).toLocaleString('en-US'), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "EPC Total: $", EPC_data.filter(app => {
-    return app.appNum === appNum;
-  }).map(matchingApp => {
-    return;
-
-    /*#__PURE__*/
-    react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, matchingApp.total_eligible);
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_EPC_form__WEBPACK_IMPORTED_MODULE_1__.default, {
-    _appNum: appNum
+  }, 0).toLocaleString('en-US'), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_EPC_form__WEBPACK_IMPORTED_MODULE_1__.default, {
+    _appNum: appNum,
+    EPC_data: EPC_data,
+    selectYear: selectYear,
+    year: year,
+    deselectYear: deselectYear
   })));
 }
 
@@ -2019,7 +2046,8 @@ function FiscalYear(props) {
   const {
     year,
     state,
-    selectYear
+    selectYear,
+    deselectYear
   } = props;
   const {
     apiData,
@@ -2027,14 +2055,18 @@ function FiscalYear(props) {
     EPC_data
   } = state;
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
-    onClick: () => selectYear(year)
-  }, year), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, selectedYear === year ? apiData.fundingDetail.map((app, idx) => {
+    className: "fiscalYear",
+    onClick: () => state.selectedYear ? deselectYear() : selectYear(year)
+  }, "Fiscal Year: ", year, " ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", null, "+")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, selectedYear === year ? apiData.fundingDetail.map((app, idx) => {
     return app.fundingYear * 1 === year ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_E_App__WEBPACK_IMPORTED_MODULE_1__.default, {
       frn: app.frn,
       appNum: app[471],
       fundingYear: app.fundingYear,
       inventory: app.inventory,
       EPC_data: EPC_data,
+      year: year,
+      selectYear: selectYear,
+      deselectYear: deselectYear,
       key: idx
     }) : '';
   }) : ''));

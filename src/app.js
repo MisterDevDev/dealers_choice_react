@@ -13,28 +13,33 @@ export default class App extends Component {
 
   async componentDidMount () {
     const apiData = (await axios.get('/api')).data
+    this.setState({
+      apiData
+    })
+  }
+
+  selectYear = async(year) => {
     const EPC_data = (await axios.get('/db')).data
     this.setState({
-      apiData,
+      selectedYear: year,
       EPC_data
     })
   }
 
-  selectYear = (year) => {
+  deselectYear = () => {
     this.setState({
-      selectedYear: year
+      selectedYear: ''
     })
   }
 
   render() { 
-    console.log(this)
     return ( 
-      <div>
-        <FiscalYear year={2018} 
+      <div className='app'>
+        <FiscalYear year={2018} deselectYear = {this.deselectYear}
         state={this.state} selectYear={this.selectYear}/>
-        <FiscalYear year={2019} 
+        <FiscalYear year={2019} deselectYear = {this.deselectYear}
         state={this.state} selectYear={this.selectYear}/>
-        <FiscalYear year={2020} 
+        <FiscalYear year={2020} deselectYear = {this.deselectYear}
         state={this.state} selectYear={this.selectYear}/>
       </div>
      );
