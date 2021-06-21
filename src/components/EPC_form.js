@@ -25,7 +25,7 @@ export default class EPC_form extends Component {
             total_eligible: this.state.total,
             appNum: this.props._appNum
         })
-        this.props.deselectYear()
+        this.props.selectYear()
         this.props.selectYear(this.props.year)
     }
 
@@ -35,6 +35,16 @@ export default class EPC_form extends Component {
         })
     } 
 
+    destroyData = async (appNum) => {
+        const deleted = await axios.delete(`/db/delete/${appNum}`)
+        .then(this.reset())
+    }
+
+    reset = () => {
+        this.props.selectYear()
+        this.props.selectYear(this.props.year)
+    }
+
     componentDidMount () {
         this.findEpcMatch()
     }
@@ -43,9 +53,30 @@ export default class EPC_form extends Component {
         const total = this.state.total_eligible
         return (
             <div className='EPC_form'>
-                <div>EPC Amount: ${total ? (total*1).toLocaleString('en-US'): 0}</div>
+                <div className='epcContainer'>
+                    <div>EPC Amount: ${total ? (total*1).toLocaleString('en-US'): 0}&emsp;&emsp;&ensp;</div> 
+                    <button className='deleteBtn' onClick={()=> this.destroyData(this.props._appNum)}>DELETE DATA</button>   
+                </div>
                 <div>
-                    {total ? '' :
+                    {total ? 
+                    <div className='updateContainer'>
+                        <div>
+                            <input 
+                            type='number' 
+                            style= {{ flex: '10', padding: '5px' }}
+                            placeholder='Update EPC Number'
+                            value={this.state.total}
+                            onChange={this.handleChange}
+                            />
+                            <input 
+                            type='submit' 
+                            value= 'Update'
+                            className= 'btn'
+                            style={{flex: '1'}}
+                            />
+                        </div>
+                    </div>
+                    :
                     <form onSubmit={this.postHandler} style={{ display: 'flex' }}>
                         <div>
                             <input 

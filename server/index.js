@@ -28,6 +28,15 @@ app.get('/api', async (req, res) => {
     res.send(data)
 })
 
+app.delete('/db/delete/:id', async (req, res, next) => {
+  try {
+    const EPC_app = await Application.findByPk(req.params.id);
+    await EPC_app.destroy();
+    res.send('Delete Successful')
+  } catch (error) {
+      console.log(error)
+  }
+} )
 
 app.post('/db/post', async(req, res, next) => {
   try {

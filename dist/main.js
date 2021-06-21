@@ -1940,13 +1940,20 @@ class EPC_form extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
       total_eligible: this.state.total,
       appNum: this.props._appNum
     });
-    this.props.deselectYear();
+    this.props.selectYear();
     this.props.selectYear(this.props.year);
   };
   handleChange = event => {
     this.setState({
       total: event.target.value
     });
+  };
+  destroyData = async appNum => {
+    const deleted = await axios__WEBPACK_IMPORTED_MODULE_1___default().delete(`/db/delete/${appNum}`).then(this.reset());
+  };
+  reset = () => {
+    this.props.selectYear();
+    this.props.selectYear(this.props.year);
   };
 
   componentDidMount() {
@@ -1957,7 +1964,30 @@ class EPC_form extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
     const total = this.state.total_eligible;
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
       className: "EPC_form"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "EPC Amount: $", total ? (total * 1).toLocaleString('en-US') : 0), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, total ? '' : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("form", {
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+      className: "epcContainer"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, "EPC Amount: $", total ? (total * 1).toLocaleString('en-US') : 0, "\u2003\u2003\u2002"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", {
+      className: "deleteBtn",
+      onClick: () => this.destroyData(this.props._appNum)
+    }, "DELETE DATA")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, total ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+      className: "updateContainer"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", {
+      type: "number",
+      style: {
+        flex: '10',
+        padding: '5px'
+      },
+      placeholder: "Update EPC Number",
+      value: this.state.total,
+      onChange: this.handleChange
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", {
+      type: "submit",
+      value: "Update",
+      className: "btn",
+      style: {
+        flex: '1'
+      }
+    }))) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("form", {
       onSubmit: this.postHandler,
       style: {
         display: 'flex'
